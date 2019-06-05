@@ -5,7 +5,7 @@ Generate a consent receipt (CR) JSON.
 ## Quick Use :running_woman:‍
 
 ```sh
-import ConsentGenerator from 'consent-generator';
+import {ConsentGenerator as ConsentGenerator} from 'consent-generator';
 
 <ConsentGenerator formData={{"test": "lorem ipsum"}} APIroot={"http://localhost:5000/api/v1/"} verifyOptions={{
             issuer: 'issuer',
