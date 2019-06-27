@@ -1,7 +1,7 @@
 /**
- * Datafund Consent generator & viewer 
- * Licensed under the MIT license 
- * Created by Markus Zevnik, Tadej Fius, Èrt Ahlin 
+ * Datafund Consent generator & viewer
+ * Licensed under the MIT license
+ * Created by Markus Zevnik, Tadej Fius, ÄŒrt Ahlin
  */
 
 import React, { Component } from "react";
@@ -12,7 +12,7 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import "./ConsentGenerator.css";
 
-export default class ConsentGenerator extends Component {
+class ConsentGenerator extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -259,3 +259,5 @@ export default class ConsentGenerator extends Component {
     }
 
 }
+
+export default ConsentGenerator;
