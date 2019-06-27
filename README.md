@@ -107,7 +107,7 @@ let verifyOptions = {
 <ConsentGenerator formData={{formData}} APIroot={{APIroot}} verifyOptions={{verifyOptions}} />
 ```
 
-## Props :hammer_and_wrench:
+## Props
 - `formData` (json)
 - `APIroot` (string)
 - `verifyOptions` (json)
