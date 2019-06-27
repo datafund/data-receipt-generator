@@ -1,12 +1,12 @@
 {
-  "name": "consent-generator",
-  "version": "0.1.1",
+  "name": "@datafund/consent-generator",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "description": "React plugin for generating a Consent Receipt (CR) JSON server-side.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/datafund/dr-generator.git"
+    "url": "git+https://github.com/datafund/dr-generator.git"
   },
   "author": "Datafund <info@datafund.io> (https://datafund.io)",
   "license": "ISC",
@@ -51,5 +51,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/datafund/dr-generator/issues"
+  },
+  "homepage": "https://github.com/datafund/dr-generator#readme"
 }
