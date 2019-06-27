@@ -11,19 +11,21 @@ var _reactJsonPretty = _interopRequireDefault(require("react-json-pretty"));
 
 var _lodash = _interopRequireDefault(require("lodash"));
 
-var _reactstrap = require("reactstrap");
-
 var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 
 var _axios = _interopRequireDefault(require("axios"));
 
-var _classnames = _interopRequireDefault(require("classnames"));
+var _jsFileDownload = _interopRequireDefault(require("js-file-download"));
 
 require("./ConsentGenerator.css");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -56,6 +58,8 @@ function (_Component) {
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ConsentGenerator).call(this, props));
     _this2.state = {
       formData: _this2.props.formData ? _this2.props.formData : {},
+      APIroot: _this2.props.APIroot ? _this2.props.APIroot : 'http://localhost:5000/api/v1/',
+      verifyOptions: _this2.props.verifyOptions ? _this2.props.verifyOptions : {},
       cleanFormData: {},
       algorithmTab: '1',
       privateKey: ''
@@ -64,6 +68,8 @@ function (_Component) {
     _this2.decodeJwt = _this2.decodeJwt.bind(_assertThisInitialized(_this2));
     _this2.verifyJwtRS256 = _this2.verifyJwtRS256.bind(_assertThisInitialized(_this2));
     _this2.onClean = _this2.onClean.bind(_assertThisInitialized(_this2));
+    _this2.getPublicKey = _this2.getPublicKey.bind(_assertThisInitialized(_this2));
+    _this2.downloadJwtCrFile = _this2.downloadJwtCrFile.bind(_assertThisInitialized(_this2));
     console.log(_this2.props);
     console.log(props);
     return _this2;
@@ -115,7 +121,7 @@ function (_Component) {
       console.log("PRIVATE KEY: ", _this.state.privateKey);
       console.log(_this.state.cleanFormData);
 
-      _axios.default.post('http://localhost:5000/api/v1/token', _this.state.cleanFormData, {
+      _axios.default.post(_this.state.APIroot + 'token', _this.state.cleanFormData, {
         headers: {}
       }).then(function (response) {
         // TODO: check response type
@@ -149,16 +155,9 @@ function (_Component) {
       var _this = this;
 
       console.log("_this.state.formData.publicKey ", _this.state.formData.publicKey);
-      var verifyOptions = {
-        issuer: 'issuer',
-        subject: 'subject',
-        audience: 'audience',
-        expiresIn: "12h",
-        algorithm: "RS256"
-      };
 
       try {
-        var legit = _jsonwebtoken.default.verify(_this.state.jwtToken, _this.state.formData.publicKey, verifyOptions);
+        var legit = _jsonwebtoken.default.verify(_this.state.jwtToken, _this.state.formData.publicKey, _this.state.verifyOptions);
 
         _this.setState({
           signature: legit
@@ -168,6 +167,33 @@ function (_Component) {
       } catch (e) {
         alert("Invalid signature!");
       }
+    }
+  }, {
+    key: "getPublicKey",
+    value: function getPublicKey() {
+      var _this = this;
+
+      _axios.default.get(_this.state.APIroot + 'publicKey', {
+        headers: {}
+      }).then(function (response) {
+        console.log("RESPONSE", response);
+
+        _this.setState({
+          formData: _objectSpread({}, _this.state.formData, {
+            publicKey: response.data.key
+          })
+        });
+      }).catch(function (error) {
+        alert("Network error!");
+        throw error;
+      });
+    }
+  }, {
+    key: "downloadJwtCrFile",
+    value: function downloadJwtCrFile() {
+      var _this = this;
+
+      (0, _jsFileDownload.default)(_this.state.jwtToken, 'file.JWT.CR');
     }
   }, {
     key: "render",
@@ -204,22 +230,29 @@ function (_Component) {
         className: "p-2 mt-3",
         json: this.state.jwtTokenDecoded,
         themeClassName: "json-pretty"
-      })), _react.default.createElement("hr", null), _react.default.createElement("h5", {
+      }), _react.default.createElement("a", {
+        className: "btn btn-secondary mt-2 text-white",
+        onClick: this.downloadJwtCrFile
+      }, " Download JWT.CR")), _react.default.createElement("hr", null), _react.default.createElement("h5", {
         className: "mt-4"
       }, "Verify signature"), _react.default.createElement("div", {
         className: "form-group"
       }, _react.default.createElement("label", {
         htmlFor: "root_version"
-      }, "RSA Public Key"), " ", _react.default.createElement("textarea", {
+      }, "RSA Public Key ", _react.default.createElement("a", {
+        className: "btn btn-sm btn-secondary ml-4 text-white",
+        onClick: this.getPublicKey
+      }, " Get Public Key")), " ", _react.default.createElement("textarea", {
         className: "form-control d-block mb-3",
-        placeholder: "insert private key",
+        placeholder: "insert public key",
         rows: 10,
         onChange: function onChange(e) {
           _this.state.formData.publicKey = e.target.value;
 
           _this.forceUpdate();
         },
-        defaultValue: _this.state.formData.publicKey
+        defaultValue: _this.state.formData.publicKey,
+        value: _this.state.formData.publicKey
       })), _react.default.createElement("a", {
         className: "btn btn-success text-white mt-3",
         onClick: function onClick(e) {
@@ -238,4 +271,5 @@ function (_Component) {
   return ConsentGenerator;
 }(_react.Component);
 
-exports.default = ConsentGenerator;
+var _default = ConsentGenerator;
+exports.default = _default;
